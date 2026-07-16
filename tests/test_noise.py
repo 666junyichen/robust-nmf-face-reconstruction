@@ -96,6 +96,13 @@ def test_rejects_invalid_images(
         add_salt_pepper_noise(image, 0.5, 0.5)  # type: ignore[arg-type]
 
 
+def test_rejects_finite_complex_image_as_not_real_valued() -> None:
+    image = np.array([0.5 + 0.25j, 0.75 - 0.5j])
+
+    with pytest.raises(TypeError, match="real-valued"):
+        add_salt_pepper_noise(image, 0.5, 0.5)
+
+
 @pytest.mark.parametrize(
     ("corruption", "salt_ratio", "match"),
     [

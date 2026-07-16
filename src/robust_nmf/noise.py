@@ -45,7 +45,7 @@ def add_salt_pepper_noise(
     if not np.issubdtype(image.dtype, np.number) or np.issubdtype(
         image.dtype, np.complexfloating
     ):
-        raise TypeError("image must have a real numeric dtype")
+        raise TypeError("image must contain real-valued numeric data")
     if not np.all(np.isfinite(image)):
         raise ValueError("image values must all be finite")
 

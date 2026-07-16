@@ -52,6 +52,12 @@ class FaceDataset:
             raise ValueError("class_names must contain nonempty strings")
         if sample_count and (np.min(self.labels) < 0 or np.max(self.labels) >= len(self.class_names)):
             raise ValueError("labels must index class_names")
+        matrix = self.matrix.copy()
+        labels = self.labels.copy()
+        matrix.setflags(write=False)
+        labels.setflags(write=False)
+        object.__setattr__(self, "matrix", matrix)
+        object.__setattr__(self, "labels", labels)
 
 
 def _validate_resize(resize: tuple[int, int] | None) -> None:
@@ -80,7 +86,21 @@ def _image_paths(root: Path) -> tuple[Path, ...]:
     ]
     if not paths:
         raise ValueError(f"no supported image files found in {root}")
-    return tuple(sorted(paths, key=lambda path: (path.as_posix().casefold(), path.as_posix())))
+    sorted_paths = tuple(
+        sorted(paths, key=lambda path: (path.as_posix().casefold(), path.as_posix()))
+    )
+    invalid_paths = [
+        path.relative_to(root).as_posix()
+        for path in sorted_paths
+        if len(path.relative_to(root).parts) != 2
+    ]
+    if invalid_paths:
+        formatted = ", ".join(invalid_paths)
+        raise ValueError(
+            "supported images must use the root/class/image layout; "
+            f"offending paths: {formatted}"
+        )
+    return sorted_paths
 
 
 def load_face_directory(
@@ -88,6 +108,8 @@ def load_face_directory(
 ) -> FaceDataset:
     """Load recursively discovered face images without modifying the source files.
 
+    The supported layout is exactly ``root/class/image``; deeper nesting is
+    rejected because it makes immediate-parent class labels ambiguous.
     ``resize`` is expressed as ``(height, width)``. Images are normalized to
     ``[0, 1]`` and flattened in row-major order into matrix columns.
     """

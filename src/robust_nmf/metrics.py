@@ -19,6 +19,18 @@ class ClusteringMetrics:
     nmi: float
     predicted_labels: NDArray[np.integer]
 
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.predicted_labels, np.ndarray)
+            or self.predicted_labels.ndim != 1
+        ):
+            raise TypeError("predicted_labels must be a 1D ndarray")
+        if not np.issubdtype(self.predicted_labels.dtype, np.integer):
+            raise TypeError("predicted_labels must have an integer dtype")
+        predicted_labels = self.predicted_labels.copy()
+        predicted_labels.setflags(write=False)
+        object.__setattr__(self, "predicted_labels", predicted_labels)
+
 
 def _real_finite_2d(value: object, name: str) -> NDArray[np.floating]:
     array = np.asarray(value)
@@ -138,10 +150,13 @@ def evaluate_clustering(
         raise ValueError("n_clusters cannot exceed the sample count")
     if isinstance(seed, bool) or not isinstance(seed, (int, np.integer)):
         raise TypeError("seed must be an integer")
+    seed_value = int(seed)
+    if not 0 <= seed_value <= 2**32 - 1:
+        raise ValueError("seed must be in the range 0..2**32-1")
 
     cluster_ids = KMeans(
         n_clusters=cluster_count,
-        random_state=int(seed),
+        random_state=seed_value,
         n_init=10,
     ).fit_predict(features.T)
 

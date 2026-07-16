@@ -1,16 +1,18 @@
 from dataclasses import FrozenInstanceError
-import os
 
 import numpy as np
 import pytest
-
-os.environ.setdefault("LOKY_MAX_CPU_COUNT", "1")
 
 from robust_nmf.metrics import (
     ClusteringMetrics,
     evaluate_clustering,
     relative_reconstruction_error,
 )
+
+
+@pytest.fixture(autouse=True)
+def _limit_joblib_cpu_probe(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LOKY_MAX_CPU_COUNT", "1")
 
 
 def test_relative_reconstruction_error_matches_frobenius_definition() -> None:
@@ -91,6 +93,39 @@ def test_clustering_is_deterministic_and_result_is_frozen() -> None:
     assert first.nmi == second.nmi
     with pytest.raises(FrozenInstanceError):
         first.accuracy = 0.0  # type: ignore[misc]
+
+
+def test_clustering_metrics_copies_predicted_labels_and_makes_them_read_only() -> None:
+    predicted = np.array([4, -2], dtype=np.int64)
+
+    metrics = ClusteringMetrics(1.0, 1.0, predicted)
+
+    assert not metrics.predicted_labels.flags.writeable
+    with pytest.raises(ValueError, match="read-only"):
+        metrics.predicted_labels[0] = 9
+    predicted[0] = 9
+    np.testing.assert_array_equal(metrics.predicted_labels, [4, -2])
+
+
+@pytest.mark.parametrize("seed", [0, 2**32 - 1])
+def test_clustering_accepts_seed_boundaries(seed: int) -> None:
+    result = evaluate_clustering(
+        np.array([[0.0, 0.1, 4.0, 4.1]]),
+        np.array([0, 0, 1, 1]),
+        seed=seed,
+    )
+
+    assert result.accuracy == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize("seed", [True, -1, 2**32, 1.5])
+def test_clustering_rejects_invalid_seed(seed: object) -> None:
+    with pytest.raises((TypeError, ValueError), match="seed"):
+        evaluate_clustering(
+            np.array([[0.0, 0.1, 4.0, 4.1]]),
+            np.array([0, 0, 1, 1]),
+            seed=seed,  # type: ignore[arg-type]
+        )
 
 
 @pytest.mark.parametrize(

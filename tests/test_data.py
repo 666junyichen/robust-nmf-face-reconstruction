@@ -58,6 +58,28 @@ def test_loader_ignores_macos_resource_forks(tmp_path: Path) -> None:
     assert tuple(path.name for path in dataset.paths) == ("face.png",)
 
 
+def test_loader_rejects_images_nested_below_class_directory(tmp_path: Path) -> None:
+    nested = tmp_path / "s1" / "session-a" / "face.png"
+    _save_gray(nested, [[128]])
+
+    with pytest.raises(ValueError, match=r"s1/session-a/face\.png"):
+        load_face_directory(tmp_path)
+
+
+def test_loader_lists_all_ambiguous_deep_paths(tmp_path: Path) -> None:
+    first = tmp_path / "branch-a" / "subject" / "face.png"
+    second = tmp_path / "branch-b" / "subject" / "face.png"
+    _save_gray(first, [[1]])
+    _save_gray(second, [[2]])
+
+    with pytest.raises(ValueError) as error:
+        load_face_directory(tmp_path)
+
+    message = str(error.value)
+    assert "branch-a/subject/face.png" in message
+    assert "branch-b/subject/face.png" in message
+
+
 def test_face_dataset_validates_shape_and_is_frozen() -> None:
     dataset = FaceDataset(
         matrix=np.zeros((4, 2), dtype=np.float64),
@@ -77,6 +99,24 @@ def test_face_dataset_validates_shape_and_is_frozen() -> None:
             paths=(Path("a.png"), Path("b.png")),
             class_names=("a", "b"),
         )
+
+
+def test_face_dataset_copies_arrays_and_makes_them_read_only() -> None:
+    matrix = np.zeros((4, 1), dtype=np.float64)
+    labels = np.array([0], dtype=np.int64)
+
+    dataset = FaceDataset(matrix, labels, (2, 2), (Path("a.png"),), ("a",))
+
+    assert not dataset.matrix.flags.writeable
+    assert not dataset.labels.flags.writeable
+    with pytest.raises(ValueError, match="read-only"):
+        dataset.matrix[0, 0] = 1.0
+    with pytest.raises(ValueError, match="read-only"):
+        dataset.labels[0] = 1
+    matrix[0, 0] = 0.5
+    labels[0] = 7
+    assert dataset.matrix[0, 0] == 0.0
+    assert dataset.labels[0] == 0
 
 
 @pytest.mark.parametrize(

@@ -1,0 +1,49 @@
+from pathlib import Path
+
+from robust_nmf.visualization import load_summary
+
+
+EXPECTED_ROWS = {
+    ("ORL", .2, .1, "L21-NMF"): (.209, .000, .588, .013, .744, .013),
+    ("ORL", .2, .1, "L2-NMF"): (.326, .001, .189, .005, .360, .006),
+    ("ORL", .4, .1, "L21-NMF"): (.267, .000, .417, .014, .602, .009),
+    ("ORL", .4, .1, "L2-NMF"): (.420, .000, .186, .007, .361, .008),
+    ("ORL", .6, .1, "L21-NMF"): (.324, .000, .304, .010, .503, .006),
+    ("ORL", .6, .1, "L2-NMF"): (.540, .001, .188, .008, .347, .013),
+    ("ORL", .2, .7, "L21-NMF"): (.232, .000, .412, .020, .601, .016),
+    ("ORL", .2, .7, "L2-NMF"): (.313, .001, .190, .005, .366, .012),
+    ("ORL", .4, .7, "L21-NMF"): (.288, .001, .204, .009, .404, .014),
+    ("ORL", .4, .7, "L2-NMF"): (.377, .000, .178, .008, .353, .007),
+    ("ORL", .6, .7, "L21-NMF"): (.334, .001, .257, .009, .485, .011),
+    ("ORL", .6, .7, "L2-NMF"): (.464, .002, .177, .006, .353, .014),
+    ("Extended YaleB", .2, .1, "L21-NMF"): (.199, .000, .194, .006, .251, .011),
+    ("Extended YaleB", .2, .1, "L2-NMF"): (.537, .011, .177, .006, .291, .016),
+    ("Extended YaleB", .4, .1, "L21-NMF"): (.260, .000, .141, .006, .179, .004),
+    ("Extended YaleB", .4, .1, "L2-NMF"): (.587, .006, .176, .006, .299, .017),
+    ("Extended YaleB", .6, .1, "L21-NMF"): (.337, .000, .091, .004, .096, .002),
+    ("Extended YaleB", .6, .1, "L2-NMF"): (.648, .006, .173, .008, .301, .018),
+    ("Extended YaleB", .2, .7, "L21-NMF"): (.223, .001, .223, .005, .301, .007),
+    ("Extended YaleB", .2, .7, "L2-NMF"): (.591, .013, .174, .004, .304, .012),
+    ("Extended YaleB", .4, .7, "L21-NMF"): (.290, .001, .158, .004, .208, .006),
+    ("Extended YaleB", .4, .7, "L2-NMF"): (.723, .012, .181, .003, .308, .014),
+    ("Extended YaleB", .6, .7, "L21-NMF"): (.371, .002, .122, .004, .142, .007),
+    ("Extended YaleB", .6, .7, "L2-NMF"): (.934, .024, .184, .008, .318, .022),
+}
+
+
+def test_summary_matches_cross_checked_final_table_values():
+    root = Path(__file__).resolve().parents[1]
+    summary = load_summary(root / "results" / "metrics" / "summary.csv")
+    observed = {
+        (row.dataset, row.corruption, row.salt_ratio, row.method): (
+            row.rre_mean,
+            row.rre_std,
+            row.accuracy_mean,
+            row.accuracy_std,
+            row.nmi_mean,
+            row.nmi_std,
+        )
+        for row in summary.itertuples(index=False)
+    }
+
+    assert observed == EXPECTED_ROWS

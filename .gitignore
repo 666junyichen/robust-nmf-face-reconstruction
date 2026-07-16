@@ -5,6 +5,25 @@
 venv/
 env/
 
+# Local secrets and credentials (public examples remain trackable)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+!*.example.pem
+!*.example.key
+credentials.json
+credentials.*.json
+!credentials.example.json
+secrets.json
+secrets.*.json
+!secrets.example.json
+client_secret*.json
+!client_secret.example.json
+service-account*.json
+!service-account.example.json
+
 # Python caches and build outputs
 __pycache__/
 *.py[cod]
@@ -37,7 +56,11 @@ images/
 *.synctex.gz
 *.tmp.pdf
 *-generated.pdf
-results/**/*.pdf
+
+# Generated/private results stay local; only reviewed artifacts belong elsewhere under results.
+results/figures/generated/
+results/metrics/generated/
+results/private/
 
 # Operating-system artifacts
 .DS_Store

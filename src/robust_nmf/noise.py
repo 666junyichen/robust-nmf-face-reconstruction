@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from numbers import Real
 
 import numpy as np
@@ -30,7 +31,8 @@ def add_salt_pepper_noise(
         seed: Optional seed passed to :func:`numpy.random.default_rng`.
 
     Returns:
-        A floating-point array with the same shape as ``image``.
+        A working copy normalized to NumPy ``float64`` dtype with the same
+        shape as ``image``.
 
     Raises:
         TypeError: If ``image`` is not a real-valued numeric NumPy array or a
@@ -49,11 +51,19 @@ def add_salt_pepper_noise(
     if not np.all(np.isfinite(image)):
         raise ValueError("image values must all be finite")
 
+    normalized_rates: list[float] = []
     for name, rate in (("corruption", corruption), ("salt_ratio", salt_ratio)):
         if isinstance(rate, (bool, np.bool_)) or not isinstance(rate, Real):
             raise TypeError(f"{name} must be a real number")
-        if not np.isfinite(rate) or not 0.0 <= rate <= 1.0:
+        try:
+            normalized_rate = float(rate)
+        except (OverflowError, ValueError) as exc:
+            raise ValueError(f"{name} must be finite and in [0, 1]") from exc
+        if not math.isfinite(normalized_rate) or not 0.0 <= normalized_rate <= 1.0:
             raise ValueError(f"{name} must be finite and in [0, 1]")
+        normalized_rates.append(normalized_rate)
+
+    corruption, salt_ratio = normalized_rates
 
     result = image.astype(float, copy=True)
     changed_count = round(image.size * corruption)

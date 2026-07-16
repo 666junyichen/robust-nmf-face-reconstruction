@@ -1,3 +1,5 @@
+from fractions import Fraction
+
 import numpy as np
 import pytest
 
@@ -45,6 +47,18 @@ def test_different_seeds_select_different_pixels() -> None:
     second = add_salt_pepper_noise(image, 0.4, 0.5, seed=2)
 
     assert not np.array_equal(first, second)
+
+
+def test_fraction_rates_match_equivalent_float_rates() -> None:
+    image = np.full((4, 5), 0.5)
+
+    fraction_result = add_salt_pepper_noise(
+        image, Fraction(1, 4), Fraction(2, 5), seed=17
+    )
+    float_result = add_salt_pepper_noise(image, 0.25, 0.4, seed=17)
+
+    assert fraction_result.dtype == np.dtype(np.float64)
+    np.testing.assert_array_equal(fraction_result, float_result)
 
 
 @pytest.mark.parametrize(
@@ -117,6 +131,22 @@ def test_rejects_finite_complex_image_as_not_real_valued() -> None:
 def test_rejects_rates_outside_closed_unit_interval(
     corruption: float,
     salt_ratio: float,
+    match: str,
+) -> None:
+    with pytest.raises(ValueError, match=match):
+        add_salt_pepper_noise(np.ones(4), corruption, salt_ratio)
+
+
+@pytest.mark.parametrize(
+    ("corruption", "salt_ratio", "match"),
+    [
+        (Fraction(-1, 10), Fraction(1, 2), "corruption"),
+        (Fraction(1, 2), Fraction(11, 10), "salt_ratio"),
+    ],
+)
+def test_rejects_fraction_rates_outside_closed_unit_interval(
+    corruption: Fraction,
+    salt_ratio: Fraction,
     match: str,
 ) -> None:
     with pytest.raises(ValueError, match=match):

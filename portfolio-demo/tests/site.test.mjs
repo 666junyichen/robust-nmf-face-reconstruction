@@ -195,7 +195,7 @@ test("provides equivalent English and Chinese content plus persistent language b
   assert.match(app, /document\.title/);
 });
 
-test("executes default English state and persists it", async () => {
+test("executes default English state without mutating stored preferences", async () => {
   const state = await runApp();
 
   assert.equal(state.document.documentElement.lang, "en");
@@ -205,7 +205,7 @@ test("executes default English state and persists it", async () => {
   assert.equal(state.chineseButton.getAttribute("aria-pressed"), "false");
   assert.equal(state.labelled.getAttribute("aria-label"), "Project summary");
   assert.equal(state.image.getAttribute("alt"), "RRE comparison");
-  assert.equal(state.values.get("robust-nmf-language"), "en");
+  assert.equal(state.values.has("robust-nmf-language"), false);
   assert.equal(
     state.metadata.get('meta[property="og:locale"]').getAttribute("content"),
     "en_US",
@@ -242,12 +242,13 @@ test("switches to Chinese and synchronizes metadata and accessible names", async
   );
 });
 
-test("normalizes an invalid saved preference to English", async () => {
+test("ignores an invalid saved preference without redirecting or rewriting it", async () => {
   const state = await runApp({ savedLanguage: "fr" });
 
   assert.equal(state.document.documentElement.lang, "en");
   assert.equal(state.heading.textContent, "Evidence");
-  assert.equal(state.values.get("robust-nmf-language"), "en");
+  assert.deepEqual(state.navigations, []);
+  assert.equal(state.values.get("robust-nmf-language"), "fr");
 });
 
 test("keeps working when localStorage get or set is blocked", async () => {
@@ -265,44 +266,71 @@ test("uses the document language as the default when storage has no valid prefer
 
   assert.equal(state.document.documentElement.lang, "zh-CN");
   assert.equal(state.heading.textContent, "实验依据");
-  assert.equal(state.values.get("robust-nmf-language"), "zh");
+  assert.equal(state.values.has("robust-nmf-language"), false);
 });
 
-test("redirects a saved Chinese preference from English exactly once and then stabilizes", async () => {
+test("keeps the English URL authoritative over a stale Chinese preference", async () => {
   const storageValues = new Map([["robust-nmf-language", "zh"]]);
   const englishLoad = await runApp({ defaultLang: "en", storageValues });
 
-  assert.deepEqual(englishLoad.navigations, ["zh-CN.html"]);
-  assert.equal(storageValues.get("robust-nmf-language"), "zh");
-
-  const chineseLoad = await runApp({ defaultLang: "zh-CN", storageValues });
-  assert.deepEqual(chineseLoad.navigations, []);
-  assert.equal(chineseLoad.document.documentElement.lang, "zh-CN");
-  assert.equal(chineseLoad.heading.textContent, "实验依据");
-  assert.equal(storageValues.get("robust-nmf-language"), "zh");
-});
-
-test("redirects a saved English preference from Chinese exactly once and then stabilizes", async () => {
-  const storageValues = new Map([["robust-nmf-language", "en"]]);
-  const chineseLoad = await runApp({ defaultLang: "zh-CN", storageValues });
-
-  assert.deepEqual(chineseLoad.navigations, ["./"]);
-  assert.equal(storageValues.get("robust-nmf-language"), "en");
-
-  const englishLoad = await runApp({ defaultLang: "en", storageValues });
   assert.deepEqual(englishLoad.navigations, []);
   assert.equal(englishLoad.document.documentElement.lang, "en");
   assert.equal(englishLoad.heading.textContent, "Evidence");
+  assert.equal(storageValues.get("robust-nmf-language"), "zh");
+});
+
+test("keeps the Chinese URL authoritative over a stale English preference", async () => {
+  const storageValues = new Map([["robust-nmf-language", "en"]]);
+  const chineseLoad = await runApp({ defaultLang: "zh-CN", storageValues });
+
+  assert.deepEqual(chineseLoad.navigations, []);
+  assert.equal(chineseLoad.document.documentElement.lang, "zh-CN");
+  assert.equal(chineseLoad.heading.textContent, "实验依据");
   assert.equal(storageValues.get("robust-nmf-language"), "en");
 });
 
-test("does not redirect an invalid preference and normalizes it to the page language", async () => {
-  const storageValues = new Map([["robust-nmf-language", "invalid"]]);
-  const state = await runApp({ defaultLang: "zh-CN", storageValues });
+test("a failed Chinese preference write still navigates and the target URL stays Chinese", async () => {
+  const storageValues = new Map([["robust-nmf-language", "en"]]);
+  const englishLoad = await runApp({
+    defaultLang: "en",
+    storageValues,
+    setThrows: true,
+  });
 
-  assert.deepEqual(state.navigations, []);
-  assert.equal(state.document.documentElement.lang, "zh-CN");
+  englishLoad.chineseButton.click();
+  assert.deepEqual(englishLoad.navigations, ["zh-CN.html"]);
+  assert.equal(storageValues.get("robust-nmf-language"), "en");
+
+  const chineseLoad = await runApp({
+    defaultLang: "zh-CN",
+    storageValues,
+    setThrows: true,
+  });
+  assert.deepEqual(chineseLoad.navigations, []);
+  assert.equal(chineseLoad.document.documentElement.lang, "zh-CN");
+  assert.equal(chineseLoad.heading.textContent, "实验依据");
+});
+
+test("a failed English preference write still navigates and the target URL stays English", async () => {
+  const storageValues = new Map([["robust-nmf-language", "zh"]]);
+  const chineseLoad = await runApp({
+    defaultLang: "zh-CN",
+    storageValues,
+    setThrows: true,
+  });
+
+  chineseLoad.englishButton.click();
+  assert.deepEqual(chineseLoad.navigations, ["./"]);
   assert.equal(storageValues.get("robust-nmf-language"), "zh");
+
+  const englishLoad = await runApp({
+    defaultLang: "en",
+    storageValues,
+    setThrows: true,
+  });
+  assert.deepEqual(englishLoad.navigations, []);
+  assert.equal(englishLoad.document.documentElement.lang, "en");
+  assert.equal(englishLoad.heading.textContent, "Evidence");
 });
 
 test("clicking a language first persists the choice and then navigates", async () => {
@@ -467,6 +495,17 @@ test("keeps the complete translatable field inventory aligned across static loca
   assert.equal(count(chinese, "data-en"), count(english, "data-en"));
   assert.equal(count(chinese, "data-zh"), count(english, "data-zh"));
   assert.equal(count(chinese, "data-en"), count(chinese, "data-zh"));
+});
+
+test("marks English metric abbreviations on the Chinese page", async () => {
+  const chinese = await read("zh-CN.html");
+
+  for (const metric of ["RRE ↓", "Accuracy ↑", "NMI ↑"]) {
+    assert.match(
+      chinese,
+      new RegExp(`<th scope="col" lang="en">${metric.replace(/[↑↓]/g, "\\$&")}<\\/th>`),
+    );
+  }
 });
 
 test("configures security headers for every Vercel route", async () => {

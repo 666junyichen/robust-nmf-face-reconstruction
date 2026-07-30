@@ -40,7 +40,7 @@
     document.querySelector('meta[name="twitter:image:alt"]'),
   ];
 
-  function applyLanguage(language) {
+  function applyLanguage(language, { persist = false } = {}) {
     const nextLanguage = language === "zh" ? "zh" : "en";
 
     document.documentElement.lang = nextLanguage === "zh" ? "zh-CN" : "en";
@@ -73,36 +73,24 @@
       button.setAttribute("aria-pressed", String(button.dataset.language === nextLanguage));
     }
 
-    try {
-      localStorage.setItem(storageKey, nextLanguage);
-    } catch {
-      // Storage can be unavailable in privacy-restricted browsing contexts.
+    if (persist) {
+      try {
+        localStorage.setItem(storageKey, nextLanguage);
+      } catch {
+        // Storage can be unavailable in privacy-restricted browsing contexts.
+      }
     }
   }
 
   const documentLanguage = document.documentElement.lang.toLowerCase().startsWith("zh")
     ? "zh"
     : "en";
-  let savedLanguage = null;
-  try {
-    savedLanguage = localStorage.getItem(storageKey);
-  } catch {
-    savedLanguage = null;
-  }
-
-  if (
-    (savedLanguage === "en" || savedLanguage === "zh") &&
-    savedLanguage !== documentLanguage
-  ) {
-    window.location.assign(savedLanguage === "zh" ? "zh-CN.html" : "./");
-    return;
-  }
   applyLanguage(documentLanguage);
 
   for (const button of languageButtons) {
     button.addEventListener("click", () => {
       const nextLanguage = button.dataset.language === "zh" ? "zh" : "en";
-      applyLanguage(nextLanguage);
+      applyLanguage(nextLanguage, { persist: true });
       window.location.assign(nextLanguage === "zh" ? "zh-CN.html" : "./");
     });
   }

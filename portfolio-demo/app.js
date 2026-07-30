@@ -9,8 +9,12 @@
     zh: "鲁棒 NMF — 重建研究档案",
   };
   const locales = {
-    en: "en_AU",
+    en: "en_US",
     zh: "zh_CN",
+  };
+  const socialImageDescriptions = {
+    en: "RRE comparison across ORL and Extended YaleB corruption settings",
+    zh: "ORL 与 Extended YaleB 各噪声设置下的 RRE 对比",
   };
 
   const translatableElements = [...document.querySelectorAll("[data-en][data-zh]")];
@@ -31,6 +35,10 @@
     ],
   };
   const openGraphLocale = document.querySelector('meta[property="og:locale"]');
+  const socialImageAlternatives = [
+    document.querySelector('meta[property="og:image:alt"]'),
+    document.querySelector('meta[name="twitter:image:alt"]'),
+  ];
 
   function applyLanguage(language) {
     const nextLanguage = language === "zh" ? "zh" : "en";
@@ -44,6 +52,9 @@
     );
     socialMetadata.description.forEach((element) =>
       element?.setAttribute("content", descriptions[nextLanguage]),
+    );
+    socialImageAlternatives.forEach((element) =>
+      element?.setAttribute("content", socialImageDescriptions[nextLanguage]),
     );
 
     for (const element of translatableElements) {
@@ -69,17 +80,30 @@
     }
   }
 
-  let savedLanguage = "en";
+  const documentLanguage = document.documentElement.lang.toLowerCase().startsWith("zh")
+    ? "zh"
+    : "en";
+  let savedLanguage = null;
   try {
-    savedLanguage = localStorage.getItem(storageKey) || "en";
+    savedLanguage = localStorage.getItem(storageKey);
   } catch {
-    savedLanguage = "en";
+    savedLanguage = null;
   }
 
-  applyLanguage(savedLanguage);
+  applyLanguage(documentLanguage);
+  if (
+    (savedLanguage === "en" || savedLanguage === "zh") &&
+    savedLanguage !== documentLanguage
+  ) {
+    window.location.assign(savedLanguage === "zh" ? "zh-CN.html" : "./");
+  }
 
   for (const button of languageButtons) {
-    button.addEventListener("click", () => applyLanguage(button.dataset.language));
+    button.addEventListener("click", () => {
+      const nextLanguage = button.dataset.language === "zh" ? "zh" : "en";
+      applyLanguage(nextLanguage);
+      window.location.assign(nextLanguage === "zh" ? "zh-CN.html" : "./");
+    });
   }
 
   const revealTargets = document.querySelectorAll(

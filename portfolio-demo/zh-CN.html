@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="一份双语重建研究档案，记录四人团队完成的鲁棒 NMF 人脸重建项目。"
+    >
+    <link rel="canonical" href="https://robust-nmf-face-reconstruction.vercel.app/zh-CN">
+    <link rel="alternate" hreflang="en" href="https://robust-nmf-face-reconstruction.vercel.app/">
+    <link rel="alternate" hreflang="zh-CN" href="https://robust-nmf-face-reconstruction.vercel.app/zh-CN">
+    <link rel="alternate" hreflang="x-default" href="https://robust-nmf-face-reconstruction.vercel.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://robust-nmf-face-reconstruction.vercel.app/zh-CN">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:title" content="鲁棒 NMF — 重建研究档案">
+    <meta
+      property="og:description"
+      content="一份双语重建研究档案，记录四人团队完成的鲁棒 NMF 人脸重建项目。"
+    >
+    <meta property="og:image" content="https://robust-nmf-face-reconstruction.vercel.app/assets/rre_comparison.png">
+    <meta property="og:image:width" content="814">
+    <meta property="og:image:height" content="1192">
+    <meta property="og:image:alt" content="ORL 与 Extended YaleB 各噪声设置下的 RRE 对比">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="鲁棒 NMF — 重建研究档案">
+    <meta
+      name="twitter:description"
+      content="一份双语重建研究档案，记录四人团队完成的鲁棒 NMF 人脸重建项目。"
+    >
+    <meta name="twitter:image" content="https://robust-nmf-face-reconstruction.vercel.app/assets/rre_comparison.png">
+    <meta name="twitter:image:alt" content="ORL 与 Extended YaleB 各噪声设置下的 RRE 对比">
+    <title>鲁棒 NMF — 重建研究档案</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-en="Skip to main content" data-zh="跳至主要内容">跳至主要内容</a>
+
+    <header class="masthead">
+      <a
+        class="wordmark"
+        href="#top"
+        aria-label="鲁棒 NMF 研究档案首页"
+        data-en-aria-label="Robust NMF dossier home"
+        data-zh-aria-label="鲁棒 NMF 研究档案首页"
+      >
+        <span>RNMF</span>
+        <small data-en="RECONSTRUCTION DOSSIER" data-zh="重建研究档案">重建研究档案</small>
+      </a>
+      <nav
+        class="top-nav"
+        aria-label="主要导航"
+        data-en-aria-label="Primary navigation"
+        data-zh-aria-label="主要导航"
+      >
+        <a href="#evidence" data-en="Evidence" data-zh="实验依据">实验依据</a>
+        <a href="#reproducibility" data-en="Reproduce" data-zh="复现">复现</a>
+        <a href="#collaboration" data-en="Credits" data-zh="协作说明">协作说明</a>
+      </nav>
+      <div
+        class="language-switcher"
+        role="group"
+        aria-label="语言"
+        data-en-aria-label="Language"
+        data-zh-aria-label="语言"
+      >
+        <button type="button" data-language="en" aria-pressed="false"><span lang="en">EN</span></button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-language="zh" aria-pressed="true">中文</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="case-index" aria-hidden="true">
+          <span>CASE 04</span><span>LOW-RANK / ROBUSTNESS</span><span>FILED 2026</span>
+        </div>
+        <div class="hero-copy">
+          <p class="eyebrow" data-en="AI / ML · FACE RECONSTRUCTION" data-zh="AI / ML · 人脸重建">AI / ML · 人脸重建</p>
+          <h1 id="hero-title">
+            <span data-en="When noise" data-zh="当噪声">当噪声</span>
+            <em data-en="breaks the face," data-zh="破坏人脸，">破坏人脸，</em>
+            <span data-en="which factorization holds?" data-zh="哪种分解仍然可靠？">哪种分解仍然可靠？</span>
+          </h1>
+          <p
+            class="hero-deck"
+            data-en="A documented comparison of standard L2-NMF and an L2,1-oriented robust factorization under salt-and-pepper corruption—built from a completed four-person team experiment."
+            data-zh="一份记录完整的对比档案：在椒盐噪声破坏下比较标准 L2-NMF 与 L2,1 导向的鲁棒分解，依据来自已完成的四人团队实验。"
+          >
+            一份记录完整的对比档案：在椒盐噪声破坏下比较标准 L2-NMF 与 L2,1 导向的鲁棒分解，依据来自已完成的四人团队实验。
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#evidence">
+              <span data-en="Inspect the evidence" data-zh="查看实验依据">查看实验依据</span><span aria-hidden="true">↓</span>
+            </a>
+            <a class="button button-line" href="https://github.com/666junyichen/robust-nmf-face-reconstruction" target="_blank" rel="noreferrer">
+              <span data-en="Open GitHub" data-zh="打开 GitHub">打开 GitHub</span><span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+        <aside
+          class="hero-note"
+          aria-label="项目摘要"
+          data-en-aria-label="Project summary"
+          data-zh-aria-label="项目摘要"
+        >
+          <span class="note-number">01</span>
+          <p data-en="Two datasets" data-zh="两个数据集">两个数据集</p>
+          <strong lang="en">ORL + Extended YaleB</strong>
+          <p data-en="Six stored corruption settings per method and dataset" data-zh="每种方法、每个数据集各六组已存噪声设置">
+            每种方法、每个数据集各六组已存噪声设置
+          </p>
+          <div class="noise-swatch" aria-hidden="true"></div>
+        </aside>
+      </section>
+
+      <section class="problem dossier-section" id="problem" aria-labelledby="problem-title">
+        <div class="section-label"><span>01</span><p data-en="The problem" data-zh="问题定义">问题定义</p></div>
+        <div class="section-copy">
+          <h2 id="problem-title" data-en="Recover structure from corrupted observations." data-zh="从受污染的观测中恢复结构。">从受污染的观测中恢复结构。</h2>
+          <p
+            data-en="Face images can be arranged as a nonnegative matrix: pixels by samples. NMF seeks a compact basis W and coefficients H whose product reconstructs that matrix. Salt-and-pepper corruption inserts sparse, high-contrast errors that can dominate a squared-error objective."
+            data-zh="人脸图像可排列为一个非负矩阵：像素 × 样本。NMF 寻找紧凑的基矩阵 W 与系数矩阵 H，并用二者乘积重建该矩阵。椒盐噪声会插入稀疏、高对比度误差，从而主导平方误差目标。"
+          >
+            人脸图像可排列为一个非负矩阵：像素 × 样本。NMF 寻找紧凑的基矩阵 W 与系数矩阵 H，并用二者乘积重建该矩阵。椒盐噪声会插入稀疏、高对比度误差，从而主导平方误差目标。
+          </p>
+        </div>
+        <div
+          class="equation-card"
+          aria-label="矩阵分解符号"
+          data-en-aria-label="Matrix factorization notation"
+          data-zh-aria-label="矩阵分解符号"
+        >
+          <span class="matrix">X</span><span>≈</span><span class="matrix cobalt">W</span><span>×</span><span class="matrix cobalt">H</span>
+          <small data-en="observations → basis × coefficients" data-zh="观测 → 基矩阵 × 系数">观测 → 基矩阵 × 系数</small>
+        </div>
+      </section>
+
+      <section class="method dossier-section ruled" id="method" aria-labelledby="method-title">
+        <div class="section-label"><span>02</span><p data-en="Method contrast" data-zh="方法对比">方法对比</p></div>
+        <div class="method-heading">
+          <h2 id="method-title" data-en="Same low-rank idea. Different treatment of error." data-zh="同一种低秩思想，不同的误差处理。">同一种低秩思想，不同的误差处理。</h2>
+        </div>
+        <article class="method-card baseline">
+          <p class="stamp" data-en="BASELINE" data-zh="基线">基线</p>
+          <h3 lang="en">L2-NMF</h3>
+          <p
+            data-en="Minimizes squared reconstruction error. It is direct and interpretable, but isolated extreme pixels receive disproportionate influence."
+            data-zh="最小化平方重建误差。方法直接且易于解释，但少量极端像素会获得不成比例的影响。"
+          >最小化平方重建误差。方法直接且易于解释，但少量极端像素会获得不成比例的影响。</p>
+          <code lang="en">min ||X − WH||²<sub>F</sub></code>
+        </article>
+        <article class="method-card robust">
+          <p class="stamp" data-en="ROBUST ORIENTATION" data-zh="鲁棒导向">鲁棒导向</p>
+          <h3 lang="en">L2,1-NMF</h3>
+          <p
+            data-en="Uses an explicit column-sparse residual to reduce the leverage of corrupted samples. The current solver is L2,1-oriented; equivalence to every formulation carrying that name is not claimed."
+            data-zh="使用显式列稀疏残差，降低受污染样本的影响。当前求解器属于 L2,1 导向模型；不声称与所有同名公式等价。"
+          >使用显式列稀疏残差，降低受污染样本的影响。当前求解器属于 L2,1 导向模型；不声称与所有同名公式等价。</p>
+          <code lang="en">X ≈ WH + E</code>
+        </article>
+      </section>
+
+      <section class="evidence dossier-section" id="evidence" aria-labelledby="evidence-title">
+        <div class="section-label"><span>03</span><p data-en="Recorded evidence" data-zh="已记录依据">已记录依据</p></div>
+        <div class="evidence-intro">
+          <h2 id="evidence-title" data-en="The robust model lowers RRE in every stored setting." data-zh="鲁棒模型在所有已存设置中都降低了 RRE。">鲁棒模型在所有已存设置中都降低了 RRE。</h2>
+          <p
+            data-en="Values below are three-decimal aggregates of historical experiment means, averaged across six stored corruption and salt-ratio settings for each dataset and method. They were not reproduced by the current refactor or smoke test."
+            data-zh="以下数值是历史实验均值的三位小数聚合结果：针对每个数据集和方法，对六组已存噪声比例与盐噪声比例设置取均值。当前重构与冒烟测试并未复现这些数值。"
+          >以下数值是历史实验均值的三位小数聚合结果：针对每个数据集和方法，对六组已存噪声比例与盐噪声比例设置取均值。当前重构与冒烟测试并未复现这些数值。</p>
+        </div>
+        <div class="metric-table-wrap">
+          <table>
+            <caption data-en="Historical aggregate metrics (RRE lower is better; Accuracy and NMI higher are better)" data-zh="历史聚合指标（RRE 越低越好；Accuracy 与 NMI 越高越好）">历史聚合指标（RRE 越低越好；Accuracy 与 NMI 越高越好）</caption>
+            <thead><tr><th scope="col" data-en="Dataset" data-zh="数据集">数据集</th><th scope="col" data-en="Method" data-zh="方法">方法</th><th scope="col">RRE ↓</th><th scope="col">Accuracy ↑</th><th scope="col">NMI ↑</th></tr></thead>
+            <tbody lang="en">
+              <tr><th scope="row">ORL</th><td>L2-NMF</td><td>0.407</td><td>0.185</td><td>0.357</td></tr>
+              <tr class="highlight"><th scope="row">ORL</th><td>L21-NMF</td><td>0.276</td><td>0.364</td><td>0.557</td></tr>
+              <tr><th scope="row">Extended YaleB</th><td>L2-NMF</td><td>0.670</td><td>0.178</td><td>0.304</td></tr>
+              <tr class="highlight"><th scope="row">Extended YaleB</th><td>L21-NMF</td><td>0.280</td><td>0.155</td><td>0.196</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="result-figure wide">
+          <div class="figure-index">FIG. A / RRE</div>
+          <img class="rre-plot" src="assets/rre_comparison.png" alt="ORL 与 Extended YaleB 各噪声设置下的 RRE 对比" data-en-alt="RRE comparison across ORL and Extended YaleB corruption settings" data-zh-alt="ORL 与 Extended YaleB 各噪声设置下的 RRE 对比" width="814" height="1192" loading="lazy">
+          <figcaption data-en="Across every stored setting, L21-NMF has lower RRE than L2-NMF." data-zh="在每一组已存设置中，L21-NMF 的 RRE 都低于 L2-NMF。">在每一组已存设置中，L21-NMF 的 RRE 都低于 L2-NMF。</figcaption>
+        </figure>
+        <figure class="result-figure">
+          <div class="figure-index">FIG. B / CLUSTERING</div>
+          <img class="cluster-plot" src="assets/clustering_comparison.png" alt="ORL 与 Extended YaleB 各设置下的 Accuracy 与 NMI 对比" data-en-alt="Accuracy and NMI comparison across ORL and Extended YaleB settings" data-zh-alt="ORL 与 Extended YaleB 各设置下的 Accuracy 与 NMI 对比" width="1645" height="1192" loading="lazy">
+          <figcaption data-en="ORL favors L21-NMF for Accuracy and NMI. Extended YaleB is mixed: the Accuracy leader changes by setting, while L2-NMF has higher NMI throughout the stored grid." data-zh="ORL 的 Accuracy 与 NMI 均更支持 L21-NMF。Extended YaleB 的结果较混合：Accuracy 的领先方法随设置变化，而 L2-NMF 的 NMI 在整个已存网格中更高。">ORL 的 Accuracy 与 NMI 均更支持 L21-NMF。Extended YaleB 的结果较混合：Accuracy 的领先方法随设置变化，而 L2-NMF 的 NMI 在整个已存网格中更高。</figcaption>
+        </figure>
+        <aside class="caution">
+          <strong data-en="Protocol caution" data-zh="协议注意事项">协议注意事项</strong>
+          <p
+            data-en="The historical clean-data protocol was asymmetric: L2,1-NMF refit coefficients on clean data while holding its learned basis fixed; L2-NMF evaluated factors learned from noisy data without clean-data refitting. The archive does not isolate the loss function under a perfectly symmetric protocol."
+            data-zh="历史干净数据协议并不对称：L2,1-NMF 固定已学习的基矩阵，并在干净数据上重新拟合系数；L2-NMF 则评估从含噪数据中学得的因子，未进行干净数据重拟合。因此，归档结果无法在完全对称的协议下单独归因于损失函数。"
+          >历史干净数据协议并不对称：L2,1-NMF 固定已学习的基矩阵，并在干净数据上重新拟合系数；L2-NMF 则评估从含噪数据中学得的因子，未进行干净数据重拟合。因此，归档结果无法在完全对称的协议下单独归因于损失函数。</p>
+        </aside>
+      </section>
+
+      <section class="repro dossier-section ruled" id="reproducibility" aria-labelledby="repro-title">
+        <div class="section-label"><span>04</span><p data-en="Reproducibility" data-zh="可复现性">可复现性</p></div>
+        <div class="section-copy">
+          <h2 id="repro-title" data-en="A runnable package, with a clear evidence boundary." data-zh="可运行的软件包，以及清晰的证据边界。">可运行的软件包，以及清晰的证据边界。</h2>
+          <p data-en="The smoke experiment uses a deterministic synthetic matrix to check finite RRE and nonnegative factors. It is not a benchmark and does not recreate the archived face-data experiment." data-zh="冒烟实验使用确定性的合成矩阵，检查 RRE 有限且因子非负。它不是基准测试，也不会重建归档的人脸数据实验。">冒烟实验使用确定性的合成矩阵，检查 RRE 有限且因子非负。它不是基准测试，也不会重建归档的人脸数据实验。</p>
+        </div>
+        <div class="terminal" aria-label="复现实验命令" data-en-aria-label="Reproducibility commands" data-zh-aria-label="复现实验命令">
+          <div class="terminal-bar"><span></span><span></span><span></span><small>REPRO.LOG</small></div>
+          <pre><code lang="en"><span>$</span> python -m venv .venv
+<span>$</span> python -m pip install -e ".[dev,report]"
+<span>$</span> python -m pytest
+<span>$</span> python scripts/smoke_experiment.py
+<span>$</span> python scripts/generate_result_figures.py</code></pre>
+        </div>
+        <ul class="repro-notes">
+          <li data-en="Algorithm, corruption, and clustering entry points accept explicit random seeds." data-zh="算法、噪声与聚类入口均接受显式随机种子。">算法、噪声与聚类入口均接受显式随机种子。</li>
+          <li data-en="The loader uses deterministic path and class ordering." data-zh="加载器使用确定性的路径与类别排序。">加载器使用确定性的路径与类别排序。</li>
+          <li data-en="Stored summaries are schema-validated before plotting." data-zh="已存摘要会在绘图前进行模式验证。">已存摘要会在绘图前进行模式验证。</li>
+        </ul>
+      </section>
+
+      <section class="limitations dossier-section" id="limitations" aria-labelledby="limits-title">
+        <div class="section-label"><span>05</span><p data-en="Limits" data-zh="局限">局限</p></div>
+        <h2 id="limits-title" data-en="What the dossier does not claim." data-zh="本档案不作出的结论。">本档案不作出的结论。</h2>
+        <ol class="limit-list">
+          <li><span>01</span><p data-en="Face datasets are not distributed here; full experiments require independently obtained and verified data." data-zh="本仓库不分发人脸数据集；完整实验需要自行获取并验证数据。">本仓库不分发人脸数据集；完整实验需要自行获取并验证数据。</p></li>
+          <li><span>02</span><p data-en="Stored values retain only three-decimal historical precision, without run-level observations." data-zh="已存数值仅保留历史结果的三位小数精度，且没有逐次运行观测值。">已存数值仅保留历史结果的三位小数精度，且没有逐次运行观测值。</p></li>
+          <li><span>03</span><p data-en="Global convergence is not claimed for the current robust residual solver." data-zh="当前鲁棒残差求解器不声称具有全局收敛性。">当前鲁棒残差求解器不声称具有全局收敛性。</p></li>
+          <li><span>04</span><p data-en="Clustering depends on representation quality, initialization, and evaluation protocol." data-zh="聚类结果取决于表示质量、初始化与评估协议。">聚类结果取决于表示质量、初始化与评估协议。</p></li>
+        </ol>
+      </section>
+
+      <section class="collaboration dossier-section ruled" id="collaboration" aria-labelledby="collab-title">
+        <div class="section-label"><span>06</span><p data-en="Collaboration" data-zh="协作说明">协作说明</p></div>
+        <div class="collab-lead">
+          <h2 id="collab-title" data-en="A four-person team outcome, represented precisely." data-zh="四人团队成果，准确说明贡献。">四人团队成果，准确说明贡献。</h2>
+          <p data-en="The robust L2,1-oriented implementation and the project as a whole are team outcomes. Neither is presented as solely my work." data-zh="L2,1 导向的鲁棒实现与项目整体均为团队成果；二者都不会被表述为由我独立完成。">L2,1 导向的鲁棒实现与项目整体均为团队成果；二者都不会被表述为由我独立完成。</p>
+        </div>
+        <div class="contribution-sheet">
+          <p class="stamp" data-en="DOCUMENTED PERSONAL CONTRIBUTIONS" data-zh="README 记录的个人贡献">README 记录的个人贡献</p>
+          <ul>
+            <li data-en="Implemented and validated the salt-and-pepper noise generator." data-zh="实现并验证椒盐噪声生成器。">实现并验证椒盐噪声生成器。</li>
+            <li data-en="Implemented the L2-NMF baseline and checked its objective and update rules against the literature." data-zh="实现 L2-NMF 基线，并对照文献检查其目标函数与更新规则。">实现 L2-NMF 基线，并对照文献检查其目标函数与更新规则。</li>
+            <li data-en="Researched and organized references supporting the background and motivation." data-zh="研究并整理支持背景与研究动机的参考文献。">研究并整理支持背景与研究动机的参考文献。</li>
+            <li data-en="Contributed to the theoretical framing and explanation of the compared methods." data-zh="参与构建对比方法的理论框架与解释。">参与构建对比方法的理论框架与解释。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="closing">
+        <p class="eyebrow" data-en="READ THE RECORD" data-zh="阅读完整记录">阅读完整记录</p>
+        <h2 data-en="Trace the methods, evidence, and caveats." data-zh="追溯方法、证据与限制条件。">追溯方法、证据与限制条件。</h2>
+        <div class="closing-actions">
+          <a class="button button-paper" href="assets/robust_nmf_technical_report.pdf"><span data-en="View team technical report · PDF" data-zh="查看团队技术报告 · PDF">查看团队技术报告 · PDF</span><span aria-hidden="true">↗</span></a>
+          <a class="button button-paper" href="https://github.com/666junyichen/robust-nmf-face-reconstruction" target="_blank" rel="noreferrer"><span data-en="Explore source on GitHub" data-zh="在 GitHub 查看源码">在 GitHub 查看源码</span><span aria-hidden="true">↗</span></a>
+        </div>
+        <small
+          data-en="The MIT License covers only newly organized project source code and configuration. The historical team report and figures are available for viewing and reference only; they are not MIT-licensed."
+          data-zh="MIT 许可仅适用于新整理的项目源代码与配置。历史团队报告与结果图仅供查看和参考，不适用 MIT 许可。"
+        >MIT 许可仅适用于新整理的项目源代码与配置。历史团队报告与结果图仅供查看和参考，不适用 MIT 许可。</small>
+      </section>
+    </main>
+
+    <footer><span>ROBUST NMF / 2026</span><a href="#top" data-en="Back to top ↑" data-zh="返回顶部 ↑">返回顶部 ↑</a></footer>
+  </body>
+</html>

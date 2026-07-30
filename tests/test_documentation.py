@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 from decimal import Decimal, ROUND_HALF_UP
+import json
 from pathlib import Path
 import re
 
@@ -107,6 +108,23 @@ def test_documented_repository_paths_and_commands_are_valid() -> None:
         assert "python -m pytest" in text
         assert "python scripts/smoke_experiment.py" in text
         assert "python scripts/generate_result_figures.py" in text
+
+
+def test_notebook_uses_documented_dataset_roots_and_is_clean() -> None:
+    notebook_path = ROOT / "notebooks" / "robust_nmf_experiments.ipynb"
+    raw = _text(notebook_path)
+    notebook = json.loads(raw)
+    source = "\n".join(
+        "".join(cell.get("source", ())) for cell in notebook["cells"]
+    )
+    assert "ROOT / 'data' / 'ORL'" in source
+    assert "ROOT / 'data' / 'CroppedYaleB'" in source
+    assert "ROOT / 'data' / 'orl'" not in source
+    assert "extended_yaleb" not in source
+    for cell in notebook["cells"]:
+        if cell.get("cell_type") == "code":
+            assert cell.get("execution_count") is None
+            assert cell.get("outputs") == []
 
 
 def test_personal_contributions_are_precise_and_bounded() -> None:

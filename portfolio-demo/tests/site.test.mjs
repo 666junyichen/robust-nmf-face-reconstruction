@@ -45,6 +45,7 @@ function element(dataset = {}, attributes = {}) {
 
 async function runApp({
   savedLanguage = null,
+  storageValues = null,
   defaultLang = "en",
   reducedMotion = true,
   getThrows = false,
@@ -77,7 +78,7 @@ async function runApp({
       ['meta[name="twitter:image:alt"]', "twitter:image:alt"],
     ].map(([selector, name]) => [selector, element({}, { content: name })]),
   );
-  const values = new Map();
+  const values = storageValues ?? new Map();
   if (savedLanguage !== null) values.set("robust-nmf-language", savedLanguage);
 
   const document = {
@@ -265,6 +266,52 @@ test("uses the document language as the default when storage has no valid prefer
   assert.equal(state.document.documentElement.lang, "zh-CN");
   assert.equal(state.heading.textContent, "实验依据");
   assert.equal(state.values.get("robust-nmf-language"), "zh");
+});
+
+test("redirects a saved Chinese preference from English exactly once and then stabilizes", async () => {
+  const storageValues = new Map([["robust-nmf-language", "zh"]]);
+  const englishLoad = await runApp({ defaultLang: "en", storageValues });
+
+  assert.deepEqual(englishLoad.navigations, ["zh-CN.html"]);
+  assert.equal(storageValues.get("robust-nmf-language"), "zh");
+
+  const chineseLoad = await runApp({ defaultLang: "zh-CN", storageValues });
+  assert.deepEqual(chineseLoad.navigations, []);
+  assert.equal(chineseLoad.document.documentElement.lang, "zh-CN");
+  assert.equal(chineseLoad.heading.textContent, "实验依据");
+  assert.equal(storageValues.get("robust-nmf-language"), "zh");
+});
+
+test("redirects a saved English preference from Chinese exactly once and then stabilizes", async () => {
+  const storageValues = new Map([["robust-nmf-language", "en"]]);
+  const chineseLoad = await runApp({ defaultLang: "zh-CN", storageValues });
+
+  assert.deepEqual(chineseLoad.navigations, ["./"]);
+  assert.equal(storageValues.get("robust-nmf-language"), "en");
+
+  const englishLoad = await runApp({ defaultLang: "en", storageValues });
+  assert.deepEqual(englishLoad.navigations, []);
+  assert.equal(englishLoad.document.documentElement.lang, "en");
+  assert.equal(englishLoad.heading.textContent, "Evidence");
+  assert.equal(storageValues.get("robust-nmf-language"), "en");
+});
+
+test("does not redirect an invalid preference and normalizes it to the page language", async () => {
+  const storageValues = new Map([["robust-nmf-language", "invalid"]]);
+  const state = await runApp({ defaultLang: "zh-CN", storageValues });
+
+  assert.deepEqual(state.navigations, []);
+  assert.equal(state.document.documentElement.lang, "zh-CN");
+  assert.equal(storageValues.get("robust-nmf-language"), "zh");
+});
+
+test("clicking a language first persists the choice and then navigates", async () => {
+  const storageValues = new Map();
+  const state = await runApp({ defaultLang: "en", storageValues });
+
+  state.chineseButton.click();
+  assert.equal(storageValues.get("robust-nmf-language"), "zh");
+  assert.deepEqual(state.navigations, ["zh-CN.html"]);
 });
 
 test("reduced motion skips reveal attributes and observer creation", async () => {

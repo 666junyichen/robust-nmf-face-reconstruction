@@ -90,13 +90,14 @@
     savedLanguage = null;
   }
 
-  applyLanguage(documentLanguage);
   if (
     (savedLanguage === "en" || savedLanguage === "zh") &&
     savedLanguage !== documentLanguage
   ) {
     window.location.assign(savedLanguage === "zh" ? "zh-CN.html" : "./");
+    return;
   }
+  applyLanguage(documentLanguage);
 
   for (const button of languageButtons) {
     button.addEventListener("click", () => {

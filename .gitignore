@@ -62,6 +62,9 @@ results/figures/generated/
 results/metrics/generated/
 results/private/
 
+# Local Vercel project state
+portfolio-demo/.vercel/
+
 # Operating-system artifacts
 .DS_Store
 Thumbs.db

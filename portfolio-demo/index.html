@@ -7,25 +7,57 @@
       name="description"
       content="A bilingual reconstruction dossier for a four-person robust NMF face reconstruction project."
     >
+    <link rel="canonical" href="https://robust-nmf-face-reconstruction.vercel.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://robust-nmf-face-reconstruction.vercel.app/">
+    <meta property="og:locale" content="en_AU">
+    <meta property="og:title" content="Robust NMF — Reconstruction Dossier">
+    <meta
+      property="og:description"
+      content="A bilingual reconstruction dossier for a four-person robust NMF face reconstruction project."
+    >
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Robust NMF — Reconstruction Dossier">
+    <meta
+      name="twitter:description"
+      content="A bilingual reconstruction dossier for a four-person robust NMF face reconstruction project."
+    >
     <title>Robust NMF — Reconstruction Dossier</title>
     <link rel="stylesheet" href="styles.css">
     <script src="app.js" defer></script>
   </head>
   <body>
-    <a class="skip-link" href="#main" data-en="Skip to evidence" data-zh="跳至实验依据">Skip to evidence</a>
+    <a class="skip-link" href="#main" data-en="Skip to main content" data-zh="跳至主要内容">Skip to main content</a>
 
     <header class="masthead">
-      <a class="wordmark" href="#top" aria-label="Robust NMF dossier home">
+      <a
+        class="wordmark"
+        href="#top"
+        aria-label="Robust NMF dossier home"
+        data-en-aria-label="Robust NMF dossier home"
+        data-zh-aria-label="鲁棒 NMF 研究档案首页"
+      >
         <span>RNMF</span>
         <small data-en="RECONSTRUCTION DOSSIER" data-zh="重建研究档案">RECONSTRUCTION DOSSIER</small>
       </a>
-      <nav class="top-nav" aria-label="Primary">
+      <nav
+        class="top-nav"
+        aria-label="Primary navigation"
+        data-en-aria-label="Primary navigation"
+        data-zh-aria-label="主要导航"
+      >
         <a href="#evidence" data-en="Evidence" data-zh="实验依据">Evidence</a>
         <a href="#reproducibility" data-en="Reproduce" data-zh="复现">Reproduce</a>
         <a href="#collaboration" data-en="Credits" data-zh="协作说明">Credits</a>
       </nav>
-      <div class="language-switcher" role="group" aria-label="Language">
-        <button type="button" data-language="en" aria-pressed="true">EN</button>
+      <div
+        class="language-switcher"
+        role="group"
+        aria-label="Language"
+        data-en-aria-label="Language"
+        data-zh-aria-label="语言"
+      >
+        <button type="button" data-language="en" aria-pressed="true"><span lang="en">EN</span></button>
         <span aria-hidden="true">/</span>
         <button type="button" data-language="zh" aria-pressed="false">中文</button>
       </div>
@@ -71,10 +103,15 @@
             </a>
           </div>
         </div>
-        <aside class="hero-note" aria-label="Project summary">
+        <aside
+          class="hero-note"
+          aria-label="Project summary"
+          data-en-aria-label="Project summary"
+          data-zh-aria-label="项目摘要"
+        >
           <span class="note-number">01</span>
           <p data-en="Two datasets" data-zh="两个数据集">Two datasets</p>
-          <strong>ORL + Extended YaleB</strong>
+          <strong lang="en">ORL + Extended YaleB</strong>
           <p data-en="Six stored corruption settings per method and dataset" data-zh="每种方法、每个数据集各六组已存噪声设置">
             Six stored corruption settings per method and dataset
           </p>
@@ -100,7 +137,12 @@
             inserts sparse, high-contrast errors that can dominate a squared-error objective.
           </p>
         </div>
-        <div class="equation-card" aria-label="Matrix factorization notation">
+        <div
+          class="equation-card"
+          aria-label="Matrix factorization notation"
+          data-en-aria-label="Matrix factorization notation"
+          data-zh-aria-label="矩阵分解符号"
+        >
           <span class="matrix">X</span>
           <span>≈</span>
           <span class="matrix cobalt">W</span>
@@ -122,7 +164,7 @@
         </div>
         <article class="method-card baseline">
           <p class="stamp" data-en="BASELINE" data-zh="基线">BASELINE</p>
-          <h3>L2-NMF</h3>
+          <h3 lang="en">L2-NMF</h3>
           <p
             data-en="Minimizes squared reconstruction error. It is direct and interpretable, but isolated extreme pixels receive disproportionate influence."
             data-zh="最小化平方重建误差。方法直接且易于解释，但少量极端像素会获得不成比例的影响。"
@@ -130,11 +172,11 @@
             Minimizes squared reconstruction error. It is direct and interpretable, but isolated extreme
             pixels receive disproportionate influence.
           </p>
-          <code>min ||X − WH||²<sub>F</sub></code>
+          <code lang="en">min ||X − WH||²<sub>F</sub></code>
         </article>
         <article class="method-card robust">
           <p class="stamp" data-en="ROBUST ORIENTATION" data-zh="鲁棒导向">ROBUST ORIENTATION</p>
-          <h3>L2,1-NMF</h3>
+          <h3 lang="en">L2,1-NMF</h3>
           <p
             data-en="Uses an explicit column-sparse residual to reduce the leverage of corrupted samples. The current solver is L2,1-oriented; equivalence to every formulation carrying that name is not claimed."
             data-zh="使用显式列稀疏残差，降低受污染样本的影响。当前求解器属于 L2,1 导向模型；不声称与所有同名公式等价。"
@@ -143,7 +185,7 @@
             current solver is L2,1-oriented; equivalence to every formulation carrying that name is not
             claimed.
           </p>
-          <code>X ≈ WH + E</code>
+          <code lang="en">X ≈ WH + E</code>
         </article>
       </section>
 
@@ -175,23 +217,32 @@
               <tr>
                 <th scope="col" data-en="Dataset" data-zh="数据集">Dataset</th>
                 <th scope="col" data-en="Method" data-zh="方法">Method</th>
-                <th scope="col">RRE ↓</th>
-                <th scope="col">Accuracy ↑</th>
-                <th scope="col">NMI ↑</th>
+                <th scope="col" lang="en">RRE ↓</th>
+                <th scope="col" lang="en">Accuracy ↑</th>
+                <th scope="col" lang="en">NMI ↑</th>
               </tr>
             </thead>
             <tbody>
-              <tr><th scope="row">ORL</th><td>L2-NMF</td><td>0.407</td><td>0.185</td><td>0.357</td></tr>
-              <tr class="highlight"><th scope="row">ORL</th><td>L21-NMF</td><td>0.276</td><td>0.364</td><td>0.557</td></tr>
-              <tr><th scope="row">Extended YaleB</th><td>L2-NMF</td><td>0.670</td><td>0.178</td><td>0.304</td></tr>
-              <tr class="highlight"><th scope="row">Extended YaleB</th><td>L21-NMF</td><td>0.280</td><td>0.155</td><td>0.196</td></tr>
+              <tr lang="en"><th scope="row">ORL</th><td>L2-NMF</td><td>0.407</td><td>0.185</td><td>0.357</td></tr>
+              <tr class="highlight" lang="en"><th scope="row">ORL</th><td>L21-NMF</td><td>0.276</td><td>0.364</td><td>0.557</td></tr>
+              <tr lang="en"><th scope="row">Extended YaleB</th><td>L2-NMF</td><td>0.670</td><td>0.178</td><td>0.304</td></tr>
+              <tr class="highlight" lang="en"><th scope="row">Extended YaleB</th><td>L21-NMF</td><td>0.280</td><td>0.155</td><td>0.196</td></tr>
             </tbody>
           </table>
         </div>
 
         <figure class="result-figure wide">
           <div class="figure-index">FIG. A / RRE</div>
-          <img src="assets/rre_comparison.png" alt="RRE comparison across ORL and Extended YaleB corruption settings" loading="lazy">
+          <img
+            class="rre-plot"
+            src="assets/rre_comparison.png"
+            alt="RRE comparison across ORL and Extended YaleB corruption settings"
+            data-en-alt="RRE comparison across ORL and Extended YaleB corruption settings"
+            data-zh-alt="ORL 与 Extended YaleB 各噪声设置下的 RRE 对比"
+            width="814"
+            height="1192"
+            loading="lazy"
+          >
           <figcaption
             data-en="Across every stored setting, L21-NMF has lower RRE than L2-NMF."
             data-zh="在每一组已存设置中，L21-NMF 的 RRE 都低于 L2-NMF。"
@@ -201,7 +252,16 @@
         </figure>
         <figure class="result-figure">
           <div class="figure-index">FIG. B / CLUSTERING</div>
-          <img src="assets/clustering_comparison.png" alt="Accuracy and NMI comparison across ORL and Extended YaleB settings" loading="lazy">
+          <img
+            class="cluster-plot"
+            src="assets/clustering_comparison.png"
+            alt="Accuracy and NMI comparison across ORL and Extended YaleB settings"
+            data-en-alt="Accuracy and NMI comparison across ORL and Extended YaleB settings"
+            data-zh-alt="ORL 与 Extended YaleB 各设置下的 Accuracy 与 NMI 对比"
+            width="1645"
+            height="1192"
+            loading="lazy"
+          >
           <figcaption
             data-en="ORL favors L21-NMF for Accuracy and NMI. Extended YaleB is mixed: the Accuracy leader changes by setting, while L2-NMF has higher NMI throughout the stored grid."
             data-zh="ORL 的 Accuracy 与 NMI 均更支持 L21-NMF。Extended YaleB 的结果较混合：Accuracy 的领先方法随设置变化，而 L2-NMF 的 NMI 在整个已存网格中更高。"
@@ -242,7 +302,12 @@
             factors. It is not a benchmark and does not recreate the archived face-data experiment.
           </p>
         </div>
-        <div class="terminal" aria-label="Reproducibility commands">
+        <div
+          class="terminal"
+          aria-label="Reproducibility commands"
+          data-en-aria-label="Reproducibility commands"
+          data-zh-aria-label="复现实验命令"
+        >
           <div class="terminal-bar"><span></span><span></span><span></span><small>REPRO.LOG</small></div>
           <pre><code><span>$</span> python -m venv .venv
 <span>$</span> python -m pip install -e ".[dev,report]"
@@ -343,7 +408,7 @@
           Trace the methods, evidence, and caveats.
         </h2>
         <div class="closing-actions">
-          <a class="button button-paper" href="../docs/robust_nmf_technical_report.pdf">
+          <a class="button button-paper" href="assets/robust_nmf_technical_report.pdf">
             <span data-en="View team technical report · PDF" data-zh="查看团队技术报告 · PDF">View team technical report · PDF</span>
             <span aria-hidden="true">↗</span>
           </a>
@@ -358,11 +423,11 @@
           </a>
         </div>
         <small
-          data-en="Historical report and figures are team artifacts available for viewing and reference; they are not MIT-licensed."
-          data-zh="历史报告与结果图属于团队材料，仅供查看与参考，不适用 MIT 许可。"
+          data-en="The MIT License covers only newly organized project source code and configuration. The historical team report and figures are available for viewing and reference only; they are not MIT-licensed."
+          data-zh="MIT 许可仅适用于新整理的项目源代码与配置。历史团队报告与结果图仅供查看和参考，不适用 MIT 许可。"
         >
-          Historical report and figures are team artifacts available for viewing and reference; they are
-          not MIT-licensed.
+          The MIT License covers only newly organized project source code and configuration. The historical
+          team report and figures are available for viewing and reference only; they are not MIT-licensed.
         </small>
       </section>
     </main>

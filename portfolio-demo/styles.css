@@ -499,6 +499,14 @@ tr.highlight {
   margin-top: 1rem;
 }
 
+.result-figure .rre-plot {
+  aspect-ratio: 814 / 1192;
+}
+
+.result-figure .cluster-plot {
+  aspect-ratio: 1645 / 1192;
+}
+
 .result-figure figcaption {
   padding-top: 1rem;
   border-top: 1px solid var(--rule);

@@ -8,10 +8,29 @@
     en: "Robust NMF — Reconstruction Dossier",
     zh: "鲁棒 NMF — 重建研究档案",
   };
+  const locales = {
+    en: "en_AU",
+    zh: "zh_CN",
+  };
 
   const translatableElements = [...document.querySelectorAll("[data-en][data-zh]")];
+  const labelledElements = [
+    ...document.querySelectorAll("[data-en-aria-label][data-zh-aria-label]"),
+  ];
+  const imageElements = [...document.querySelectorAll("[data-en-alt][data-zh-alt]")];
   const languageButtons = [...document.querySelectorAll("[data-language]")];
   const description = document.querySelector('meta[name="description"]');
+  const socialMetadata = {
+    title: [
+      document.querySelector('meta[property="og:title"]'),
+      document.querySelector('meta[name="twitter:title"]'),
+    ],
+    description: [
+      document.querySelector('meta[property="og:description"]'),
+      document.querySelector('meta[name="twitter:description"]'),
+    ],
+  };
+  const openGraphLocale = document.querySelector('meta[property="og:locale"]');
 
   function applyLanguage(language) {
     const nextLanguage = language === "zh" ? "zh" : "en";
@@ -19,9 +38,24 @@
     document.documentElement.lang = nextLanguage === "zh" ? "zh-CN" : "en";
     document.title = titles[nextLanguage];
     description?.setAttribute("content", descriptions[nextLanguage]);
+    openGraphLocale?.setAttribute("content", locales[nextLanguage]);
+    socialMetadata.title.forEach((element) =>
+      element?.setAttribute("content", titles[nextLanguage]),
+    );
+    socialMetadata.description.forEach((element) =>
+      element?.setAttribute("content", descriptions[nextLanguage]),
+    );
 
     for (const element of translatableElements) {
       element.textContent = element.dataset[nextLanguage];
+    }
+    for (const element of labelledElements) {
+      const key = nextLanguage === "zh" ? "zhAriaLabel" : "enAriaLabel";
+      element.setAttribute("aria-label", element.dataset[key]);
+    }
+    for (const element of imageElements) {
+      const key = nextLanguage === "zh" ? "zhAlt" : "enAlt";
+      element.setAttribute("alt", element.dataset[key]);
     }
 
     for (const button of languageButtons) {

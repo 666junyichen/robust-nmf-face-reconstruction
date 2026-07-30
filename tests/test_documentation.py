@@ -13,9 +13,40 @@ ROOT = Path(__file__).resolve().parents[1]
 ENGLISH = ROOT / "README.md"
 CHINESE = ROOT / "README.zh-CN.md"
 DATA_GUIDE = ROOT / "data" / "README.md"
+RIGHTS = ROOT / "RIGHTS.md"
+REPORT_GUIDE = ROOT / "docs" / "README.md"
+LICENSE = ROOT / "LICENSE"
 LANGUAGE_NAV = "[English](README.md) | [简体中文](README.zh-CN.md)"
 RESULT_START = "<!-- aggregate-results:start -->"
 RESULT_END = "<!-- aggregate-results:end -->"
+SCOPE_LANGUAGE = (
+    "License scope: The MIT License applies only to newly organized project "
+    "source code and configuration. It does not license `docs/*.pdf`, raw or "
+    "derived datasets, historical experiment metrics or figures transcribed "
+    "from team work, or third-party/cited works."
+)
+STANDARD_MIT_BODY = """MIT License
+
+Copyright (c) 2026 666junyichen and project contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
 
 
 def _text(path: Path) -> str:
@@ -80,7 +111,7 @@ def test_language_navigation_and_link_parity() -> None:
 
 
 def test_all_referenced_local_files_exist() -> None:
-    for document in (ENGLISH, CHINESE, DATA_GUIDE):
+    for document in (ENGLISH, CHINESE, DATA_GUIDE, RIGHTS, REPORT_GUIDE):
         for target in _local_targets(document):
             assert (document.parent / target).resolve().exists(), (
                 f"{document.relative_to(ROOT)} references missing {target}"
@@ -127,6 +158,51 @@ def test_notebook_uses_documented_dataset_roots_and_is_clean() -> None:
             assert cell.get("outputs") == []
 
 
+def test_license_scope_and_standard_mit_body_are_intact() -> None:
+    license_text = _text(LICENSE)
+    body_marker = "MIT License\n\nCopyright"
+    body_start = license_text.index(body_marker)
+    notice = license_text[:body_start]
+    standard_body = license_text[body_start:]
+    normalized_notice = " ".join(notice.split())
+    assert notice.startswith("Scope of this license\n")
+    for required in (
+        "src/",
+        "scripts/",
+        "tests/",
+        "docs/*.pdf",
+        "raw or derived datasets",
+        "historical experiment metrics or figures",
+        "third-party/cited works",
+        "RIGHTS.md",
+    ):
+        assert required in normalized_notice
+    assert "does not alter" in normalized_notice
+    assert standard_body == STANDARD_MIT_BODY
+
+
+def test_component_rights_are_complete_and_scope_language_matches() -> None:
+    for readme in (ENGLISH, CHINESE, DATA_GUIDE):
+        assert SCOPE_LANGUAGE in _text(readme)
+
+    rights = _text(RIGHTS)
+    required_components = (
+        "Newly organized code and configuration",
+        "README and notebook explanatory text",
+        "Anonymized/redacted team technical report",
+        "Historical experiment summary and derived figures",
+        "Raw or derived dataset files",
+        "Cited papers and other third-party works",
+    )
+    assert all(component in rights for component in required_components)
+    assert "CC BY 4.0" in rights
+    assert rights.count("not MIT-licensed") >= 2
+    assert "viewing and reference only" in rights
+    report_notice = _text(REPORT_GUIDE)
+    assert "anonymized/redacted team-authored historical artifact" in report_notice
+    assert "not covered by the repository's MIT License" in report_notice
+
+
 def test_personal_contributions_are_precise_and_bounded() -> None:
     english = _text(ENGLISH)
     required = (
@@ -153,7 +229,10 @@ def test_sensitive_context_is_absent_from_documentation() -> None:
         "course" + "work",
         "letter[ _-]*grade",
     )
-    combined = "\n".join(_text(path) for path in (ENGLISH, CHINESE, DATA_GUIDE))
+    combined = "\n".join(
+        _text(path)
+        for path in (ENGLISH, CHINESE, DATA_GUIDE, RIGHTS, REPORT_GUIDE, LICENSE)
+    )
     for fragment in fragments:
         assert re.search(fragment, combined, re.IGNORECASE) is None
 

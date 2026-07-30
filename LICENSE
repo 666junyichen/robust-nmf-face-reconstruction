@@ -1,3 +1,14 @@
+Scope of this license
+
+The MIT License text below applies only to newly organized project source code
+and configuration, including src/, scripts/, tests/, and code authored for this
+repository. It does not license docs/*.pdf, raw or derived datasets, historical
+experiment metrics or figures transcribed from team work, or third-party/cited
+works. See RIGHTS.md for component-level rights.
+
+This scope notice is not part of, and does not alter, the standard MIT License
+text below.
+
 MIT License
 
 Copyright (c) 2026 666junyichen and project contributors

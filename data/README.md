@@ -7,7 +7,9 @@ Official source pages:
 - [The Database of Faces (formerly ORL)](https://cam-orl.co.uk/facedatabase.html/)
 - [Extended Yale Face Database B (B+)](https://vision.ucsd.edu/datasets/extended-yale-face-database-b-b)
 
-The package's MIT license covers newly organized source code only. It does not cover either dataset, cited works, or the anonymized/redacted team technical report.
+> License scope: The MIT License applies only to newly organized project source code and configuration. It does not license `docs/*.pdf`, raw or derived datasets, historical experiment metrics or figures transcribed from team work, or third-party/cited works.
+
+See the component-level [`RIGHTS.md`](../RIGHTS.md) notice. Dataset rights remain with their original owners under their own licenses or access terms.
 
 ## Required layout
 

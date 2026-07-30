@@ -147,4 +147,6 @@ The notebook separates optional local-data reruns from visualization of stored a
 
 ## Rights
 
-The [MIT License](LICENSE) applies to the newly organized source code in this repository. The datasets, cited works, and anonymized/redacted team technical report have separate owners and terms; the MIT license does not grant rights to those materials.
+> License scope: The MIT License applies only to newly organized project source code and configuration. It does not license `docs/*.pdf`, raw or derived datasets, historical experiment metrics or figures transcribed from team work, or third-party/cited works.
+
+See the [MIT License](LICENSE) for the code grant, [`RIGHTS.md`](RIGHTS.md) for component-level terms, and the [report rights notice](docs/README.md) for the anonymized/redacted team technical report.

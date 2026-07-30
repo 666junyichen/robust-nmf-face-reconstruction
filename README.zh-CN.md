@@ -147,4 +147,6 @@ Notebook 将可选的本地数据重跑与已存聚合证据的可视化分开�
 
 ## 权利说明
 
-[MIT License](LICENSE) 仅适用于本仓库中新整理的源代码。数据集、引用作品以及匿名化/脱敏的团队技术报告各自适用独立的权利与条款；MIT 许可不授予对这些材料的权利。
+> License scope: The MIT License applies only to newly organized project source code and configuration. It does not license `docs/*.pdf`, raw or derived datasets, historical experiment metrics or figures transcribed from team work, or third-party/cited works.
+
+代码许可见 [MIT License](LICENSE)，各组件的具体权利见 [`RIGHTS.md`](RIGHTS.md)，匿名化/脱敏团队技术报告的说明见[报告权利说明](docs/README.md)。

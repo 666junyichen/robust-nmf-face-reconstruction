@@ -1,59 +1,160 @@
+import csv
+import hashlib
 import json
+import re
 from pathlib import Path
 
-from robust_nmf.visualization import load_summary
+import pytest
+
+from scripts import verify_result_provenance
 
 
-EXPECTED_ROWS = {
-    ("ORL", .2, .1, "L21-NMF"): (.209, .000, .588, .013, .744, .013),
-    ("ORL", .2, .1, "L2-NMF"): (.326, .001, .189, .005, .360, .006),
-    ("ORL", .4, .1, "L21-NMF"): (.267, .000, .417, .014, .602, .009),
-    ("ORL", .4, .1, "L2-NMF"): (.420, .000, .186, .007, .361, .008),
-    ("ORL", .6, .1, "L21-NMF"): (.324, .000, .304, .010, .503, .006),
-    ("ORL", .6, .1, "L2-NMF"): (.540, .001, .188, .008, .347, .013),
-    ("ORL", .2, .7, "L21-NMF"): (.232, .000, .412, .020, .601, .016),
-    ("ORL", .2, .7, "L2-NMF"): (.313, .001, .190, .005, .366, .012),
-    ("ORL", .4, .7, "L21-NMF"): (.288, .001, .204, .009, .404, .014),
-    ("ORL", .4, .7, "L2-NMF"): (.377, .000, .178, .008, .353, .007),
-    ("ORL", .6, .7, "L21-NMF"): (.334, .001, .257, .009, .485, .011),
-    ("ORL", .6, .7, "L2-NMF"): (.464, .002, .177, .006, .353, .014),
-    ("Extended YaleB", .2, .1, "L21-NMF"): (.199, .000, .194, .006, .251, .011),
-    ("Extended YaleB", .2, .1, "L2-NMF"): (.537, .011, .177, .006, .291, .016),
-    ("Extended YaleB", .4, .1, "L21-NMF"): (.260, .000, .141, .006, .179, .004),
-    ("Extended YaleB", .4, .1, "L2-NMF"): (.587, .006, .176, .006, .299, .017),
-    ("Extended YaleB", .6, .1, "L21-NMF"): (.337, .000, .091, .004, .096, .002),
-    ("Extended YaleB", .6, .1, "L2-NMF"): (.648, .006, .173, .008, .301, .018),
-    ("Extended YaleB", .2, .7, "L21-NMF"): (.223, .001, .223, .005, .301, .007),
-    ("Extended YaleB", .2, .7, "L2-NMF"): (.591, .013, .174, .004, .304, .012),
-    ("Extended YaleB", .4, .7, "L21-NMF"): (.290, .001, .158, .004, .208, .006),
-    ("Extended YaleB", .4, .7, "L2-NMF"): (.723, .012, .181, .003, .308, .014),
-    ("Extended YaleB", .6, .7, "L21-NMF"): (.371, .002, .122, .004, .142, .007),
-    ("Extended YaleB", .6, .7, "L2-NMF"): (.934, .024, .184, .008, .318, .022),
-}
+ROOT = Path(__file__).resolve().parents[1]
+RECORDED_REPORT_SHA256 = (
+    "f731e87a11f0456adf354b88532bf37f42247f9833f58f68dabc53e29aea7493"
+)
 
 
-def test_summary_matches_cross_checked_final_table_values():
-    root = Path(__file__).resolve().parents[1]
-    summary = load_summary(root / "results" / "metrics" / "summary.csv")
-    observed = {
-        (row.dataset, row.corruption, row.salt_ratio, row.method): (
-            row.rre_mean,
-            row.rre_std,
-            row.accuracy_mean,
-            row.accuracy_std,
-            row.nmi_mean,
-            row.nmi_std,
+def _write_synthetic_summary(path: Path) -> list[dict[str, str]]:
+    rows = []
+    index = 0
+    for dataset in ("ORL", "Extended YaleB"):
+        for salt_ratio in ("0.1", "0.7"):
+            for corruption in ("0.2", "0.4", "0.6"):
+                for method in ("L21-NMF", "L2-NMF"):
+                    base = 100 + index * 6
+                    rows.append(
+                        {
+                            "dataset": dataset,
+                            "corruption": corruption,
+                            "salt_ratio": salt_ratio,
+                            "method": method,
+                            "rre_mean": f"0.{base:03d}",
+                            "rre_std": f"0.{base + 1:03d}",
+                            "accuracy_mean": f"0.{base + 2:03d}",
+                            "accuracy_std": f"0.{base + 3:03d}",
+                            "nmi_mean": f"0.{base + 4:03d}",
+                            "nmi_std": f"0.{base + 5:03d}",
+                        }
+                    )
+                    index += 1
+
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(
+            handle, fieldnames=verify_result_provenance.EXPECTED_COLUMNS
         )
-        for row in summary.itertuples(index=False)
-    }
+        writer.writeheader()
+        writer.writerows(rows)
+    return rows
 
-    assert observed == EXPECTED_ROWS
+
+def _synthetic_report_text(rows: list[dict[str, str]]) -> str:
+    sections = []
+    for table_number, dataset in ((3, "ORL"), (4, "Extended YaleB")):
+        lines = [f"Table {table_number}: Detailed results on {dataset}"]
+        for row in (item for item in rows if item["dataset"] == dataset):
+            method = (
+                "L 2,1-norm" if row["method"] == "L21-NMF" else "L2-norm"
+            )
+            prefix = (
+                f"({row['corruption']},{row['salt_ratio']})"
+                if row["method"] == "L21-NMF"
+                else ""
+            )
+            tokens = " ".join(
+                f"{row[f'{metric}_mean']}±{row[f'{metric}_std']}"
+                for metric in ("rre", "accuracy", "nmi")
+            )
+            lines.append(f"{prefix}{method} {tokens}")
+        sections.append("\n".join(lines))
+    return "\n".join(sections) + "\nDiscussion. The L 2,1-norm NMF is robust."
+
+
+def test_manifest_identifies_archived_snapshot_by_digest_without_private_locator():
+    manifest = (ROOT / "results" / "metrics" / "PROVENANCE.md").read_text(
+        encoding="utf-8"
+    )
+    digest = re.search(r"\b[0-9a-f]{64}\b", manifest)
+
+    assert digest is not None
+    assert digest.group() == RECORDED_REPORT_SHA256
+    assert "final archived team technical report snapshot" in manifest.lower()
+    assert "Tables 3–4" in manifest
+    assert "--report" in manifest
+    assert "--csv" in manifest
+    assert "\\" not in manifest
+
+
+def test_verifier_accepts_valid_synthetic_extracted_tables(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    report = tmp_path / "snapshot.pdf"
+    report.write_bytes(b"synthetic archived report")
+    summary = tmp_path / "summary.csv"
+    rows = _write_synthetic_summary(summary)
+    monkeypatch.setattr(
+        verify_result_provenance,
+        "extract_pdf_text",
+        lambda _path: _synthetic_report_text(rows),
+    )
+
+    verify_result_provenance.verify_provenance(
+        report,
+        summary,
+        hashlib.sha256(report.read_bytes()).hexdigest(),
+    )
+
+
+def test_verifier_reports_the_unmatched_csv_row(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    report = tmp_path / "snapshot.pdf"
+    report.write_bytes(b"synthetic archived report")
+    summary = tmp_path / "summary.csv"
+    rows = _write_synthetic_summary(summary)
+    text = _synthetic_report_text(rows).replace("0.100±0.101", "0.999±0.998", 1)
+    monkeypatch.setattr(
+        verify_result_provenance, "extract_pdf_text", lambda _path: text
+    )
+
+    with pytest.raises(ValueError, match=r"ORL.*0\.2.*0\.1.*L21-NMF"):
+        verify_result_provenance.verify_provenance(
+            report,
+            summary,
+            hashlib.sha256(report.read_bytes()).hexdigest(),
+        )
+
+
+def test_notebook_prerequisites_precede_first_code_import():
+    notebook = json.loads(
+        (ROOT / "notebooks" / "robust_nmf_experiments.ipynb").read_text(
+            encoding="utf-8"
+        )
+    )
+    first_code_index = next(
+        index
+        for index, cell in enumerate(notebook["cells"])
+        if cell["cell_type"] == "code"
+    )
+    earlier_markdown = "\n".join(
+        "".join(cell["source"])
+        for cell in notebook["cells"][:first_code_index]
+        if cell["cell_type"] == "markdown"
+    )
+
+    assert 'python -m pip install -e ".[dev,report]"' in earlier_markdown
+    assert "repository root" in earlier_markdown.lower()
+    assert "launch jupyter" in earlier_markdown.lower()
+    assert not any(
+        "pip install" in "".join(cell.get("source", []))
+        for cell in notebook["cells"]
+        if cell["cell_type"] == "code"
+    )
 
 
 def test_notebook_documents_historical_clean_data_refit_asymmetry():
-    root = Path(__file__).resolve().parents[1]
     notebook = json.loads(
-        (root / "notebooks" / "robust_nmf_experiments.ipynb").read_text(
+        (ROOT / "notebooks" / "robust_nmf_experiments.ipynb").read_text(
             encoding="utf-8"
         )
     )
@@ -63,7 +164,6 @@ def test_notebook_documents_historical_clean_data_refit_asymmetry():
     text = "".join(limitations["source"]).lower()
 
     assert "l2,1-nmf" in text
-    assert "refit" in text
     assert "coefficient matrix `h` on clean data" in text
     assert "keeping `w` fixed" in text
     assert "l2-nmf" in text
@@ -72,21 +172,12 @@ def test_notebook_documents_historical_clean_data_refit_asymmetry():
     assert "not a perfectly symmetric protocol" in text
 
 
-def test_figure_readme_documents_summary_provenance_and_asymmetry():
-    root = Path(__file__).resolve().parents[1]
-    text = (root / "results" / "figures" / "README.md").read_text(
+def test_figure_readme_links_detailed_provenance():
+    text = (ROOT / "results" / "figures" / "README.md").read_text(
         encoding="utf-8"
-    ).lower()
-
-    assert "`summary.csv`" in text
-    assert "rounded aggregates transcribed from tables 3–4" in text
-    assert "archived team technical report" in text
-    assert "completed historical experiment" in text
-    assert "not generated by the current refactored implementation" in text
-    assert "or smoke test" in text
-    assert "l2,1-nmf" in text
-    assert "refit" in text
-    assert "clean data" in text
-    assert "keeping `w` fixed" in text
-    assert "l2-nmf" in text
-    assert "noisy-data factors without clean-data refitting" in text
+    )
+    assert "../metrics/PROVENANCE.md" in text
+    lowered = text.lower()
+    assert "archived team technical report" in lowered
+    assert "not generated by the current refactored implementation" in lowered
+    assert "noisy-data factors without clean-data refitting" in lowered

@@ -4,4 +4,6 @@ The PNG files in this directory are derived from `results/metrics/summary.csv`. 
 
 The historical evaluation was asymmetric: L2,1-NMF refit coefficients on clean data while keeping `W` fixed, whereas L2-NMF evaluated noisy-data factors without clean-data refitting.
 
+See the [experiment provenance record](../metrics/PROVENANCE.md) for the archived snapshot digest, table-to-CSV mapping, precision limit, and verification command.
+
 Smoke tests do not rerun the source-data experiments. They use a small deterministic synthetic matrix to check numerical invariants only.

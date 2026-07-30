@@ -78,6 +78,95 @@ def _synthetic_report_text(rows: list[dict[str, str]]) -> str:
     return "\n".join(sections) + "\nDiscussion. The L 2,1-norm NMF is robust."
 
 
+def _split_line_table_text() -> str:
+    return """Table 3: Detailed results on ORL
+(0.2, 0.1)
+L 2,1-norm
+0.100卤0.101
+0.102卤0.103
+0.104卤0.105
+L2-norm
+0.106卤0.107
+0.108卤0.109
+0.110卤0.111
+(0.4,0.7)
+L2, 1-norm
+0.200卤0.201 0.202卤0.203
+0.204卤0.205
+L 2-norm
+0.206卤0.207
+0.208卤0.209
+0.210卤0.211
+Table 4: Detailed results on Extended YaleB
+"""
+
+
+def test_parser_accumulates_split_line_metric_tokens_until_row_boundaries():
+    parsed = verify_result_provenance._parse_table_rows(
+        _split_line_table_text(), 3
+    )
+
+    assert parsed == {
+        ("0.2", "0.1", "L21-NMF"): (
+            "0.100",
+            "0.101",
+            "0.102",
+            "0.103",
+            "0.104",
+            "0.105",
+        ),
+        ("0.2", "0.1", "L2-NMF"): (
+            "0.106",
+            "0.107",
+            "0.108",
+            "0.109",
+            "0.110",
+            "0.111",
+        ),
+        ("0.4", "0.7", "L21-NMF"): (
+            "0.200",
+            "0.201",
+            "0.202",
+            "0.203",
+            "0.204",
+            "0.205",
+        ),
+        ("0.4", "0.7", "L2-NMF"): (
+            "0.206",
+            "0.207",
+            "0.208",
+            "0.209",
+            "0.210",
+            "0.211",
+        ),
+    }
+
+
+def test_parser_rejects_incomplete_split_line_row_at_method_boundary():
+    text = _split_line_table_text().replace(
+        "0.104卤0.105\nL2-norm", "0.104\nL2-norm", 1
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=r"Table 3.*exactly six metric tokens.*found 5.*L21-NMF",
+    ):
+        verify_result_provenance._parse_table_rows(text, 3)
+
+
+def test_parser_rejects_extra_split_line_token_at_pair_boundary():
+    text = _split_line_table_text().replace(
+        "0.110卤0.111\n(0.4,0.7)",
+        "0.110卤0.111\n0.112\n(0.4,0.7)",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=r"Table 3.*exactly six metric tokens.*found 7.*L2-NMF",
+    ):
+        verify_result_provenance._parse_table_rows(text, 3)
+
+
 def test_manifest_identifies_archived_snapshot_by_digest_without_private_locator():
     manifest = (ROOT / "results" / "metrics" / "PROVENANCE.md").read_text(
         encoding="utf-8"

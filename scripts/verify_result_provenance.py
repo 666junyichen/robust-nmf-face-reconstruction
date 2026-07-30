@@ -145,13 +145,33 @@ def _parse_table_rows(
     ]
     parsed: dict[tuple[str, str, str], tuple[str, ...]] = {}
     current_pair: tuple[str, str] | None = None
+    pending_key: tuple[str, str, str] | None = None
+    pending_tokens: list[str] = []
+
+    def finish_pending_row() -> None:
+        nonlocal pending_key, pending_tokens
+        if pending_key is None:
+            return
+        if len(pending_tokens) != 6:
+            raise ValueError(
+                f"Table {table_number}: expected exactly six metric tokens, "
+                f"found {len(pending_tokens)} for {pending_key}"
+            )
+        if pending_key in parsed:
+            raise ValueError(
+                f"Table {table_number}: duplicate extracted row {pending_key}"
+            )
+        parsed[pending_key] = tuple(pending_tokens)
+        pending_key = None
+        pending_tokens = []
 
     for line in normalized_lines:
-        if len(parsed) == 12:
-            break
         compact = re.sub(r"\s+", "", line)
         pair = re.search(r"\((0\.[246]),(0\.[17])\)", compact)
         if pair:
+            finish_pending_row()
+            if len(parsed) == 12:
+                break
             current_pair = (pair.group(1), pair.group(2))
 
         if "l2,1-norm" in compact:
@@ -159,20 +179,22 @@ def _parse_table_rows(
         elif "l2-norm" in compact:
             method = "L2-NMF"
         else:
-            continue
+            method = None
 
-        if current_pair is None:
-            continue
-        tokens = tuple(re.findall(r"(?<![\d.])(?:0|1)\.\d{3}(?!\d)", line))
-        if len(tokens) != 6:
-            raise ValueError(
-                f"Table {table_number}: could not parse six metric tokens for "
-                f"{current_pair} {method}; extracted line={line!r}"
+        if method is not None:
+            finish_pending_row()
+            if len(parsed) == 12:
+                break
+            if current_pair is None:
+                continue
+            pending_key = (*current_pair, method)
+
+        if pending_key is not None:
+            pending_tokens.extend(
+                re.findall(r"(?<![\d.])(?:0|1)\.\d{3}(?!\d)", line)
             )
-        key = (*current_pair, method)
-        if key in parsed:
-            raise ValueError(f"Table {table_number}: duplicate extracted row {key}")
-        parsed[key] = tokens
+
+    finish_pending_row()
     return parsed
 
 

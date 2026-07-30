@@ -1,15 +1,23 @@
 import csv
 import hashlib
+import importlib.util
 import json
 import re
 from pathlib import Path
 
 import pytest
 
-from scripts import verify_result_provenance
-
-
 ROOT = Path(__file__).resolve().parents[1]
+VERIFIER_PATH = ROOT / "scripts" / "verify_result_provenance.py"
+VERIFIER_SPEC = importlib.util.spec_from_file_location(
+    "verify_result_provenance", VERIFIER_PATH
+)
+if VERIFIER_SPEC is None or VERIFIER_SPEC.loader is None:
+    raise ImportError(f"could not load provenance verifier from {VERIFIER_PATH}")
+verify_result_provenance = importlib.util.module_from_spec(VERIFIER_SPEC)
+VERIFIER_SPEC.loader.exec_module(verify_result_provenance)
+
+
 RECORDED_REPORT_SHA256 = (
     "f731e87a11f0456adf354b88532bf37f42247f9833f58f68dabc53e29aea7493"
 )
